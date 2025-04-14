@@ -1,12 +1,25 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import streamlit as st
+
+
+
 df=pd.read_csv('startup_cleaned.csv')
 df = df.dropna(subset=['investors', 'vertical', 'city'])
 df['subvertical'] = df['subvertical'].fillna('Not Specified')
 df['date']=pd.to_datetime(df['date'])
 df['year'] = df['date'].dt.year
-st.set_page_config(page_title='Startip Funding Analysis')
+df['month']=df['date'].dt.month
+count_df=df.groupby(['year','month'])['startup'].count().reset_index()
+count_df['month']=count_df['month'].astype('int')
+count_df['year']=count_df['year'].astype('int')
+count_df['x_axis']=count_df['month'].astype(str) + '-' + count_df['year'].astype(str)
+temp_df=df.groupby(['year','month'])['amount'].sum().reset_index()
+temp_df['month']=temp_df['month'].astype('int')
+temp_df['year']=temp_df['year'].astype('int')
+temp_df['x_axis']=temp_df['month'].astype(str) + '-' + temp_df['year'].astype(str)
+st.set_page_config(page_title='Startip Funding Analysis',layout='wide')
 
 
 
@@ -34,7 +47,7 @@ def load_investor_detail(investor):
         else:
             st.warning(f"No investment data available to plot for investor: {investor}")
 
-        year_df = df[df['investors'].str.contains('IDG Ventures', na=False)].groupby('year')['amount'].sum()
+        year_df = df[df['investors'].str.contains(investor, na=False)].groupby('year')['amount'].sum()
         if  not year_df.empty and year_df.sum() > 0:
             st.subheader(f'Year Wise Investment Details - {investor}')
             fig4, ax4 = plt.subplots()
@@ -83,12 +96,27 @@ def Overall_analysis():
     total_funded_startups=df['startup'].nunique()
     col1,col2,col3=st.columns(3)
     with col1:
-        st.metric(label="Maximum Amount Invested In A Startup", value=f"{maximum_amount} Cr")
+        st.metric(label="Maximum Amount", value=f"{maximum_amount} Cr")
         st.metric(label='Average Investment',value=f"{round(mean_investment)} Cr")
     with col2:
         st.metric(label='Startup Name', value=company_name)
         st.metric(label='Total Funded Startups',value=total_funded_startups)
-    
+    st.header('Amount Invested Over Each Month')
+    # selected_option=st.selectbox('Select Type',['Total','Count'])
+    #if selected_option=='Total':
+    fig1,ax1=plt.subplots(figsize=(14, 6))
+    ax1.plot(temp_df['x_axis'],temp_df['amount'])
+    ax1.tick_params(axis='x', rotation=45)
+    ax1.set_xticks(ax1.get_xticks()[::2])
+    st.pyplot(fig1)
+    #else:
+    st.header('Startups Funded Over Each Month')  
+    fig2,ax2=plt.subplots(figsize=(14, 6))
+    ax2.plot(count_df['x_axis'],count_df['startup'])
+    ax2.tick_params(axis='x', rotation=45)
+    ax2.set_xticks(ax2.get_xticks()[::2])
+    st.pyplot(fig2)
+
 
 
 
