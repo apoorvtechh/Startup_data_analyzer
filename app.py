@@ -21,7 +21,7 @@ temp_df['year']=temp_df['year'].astype('int')
 temp_df['x_axis']=temp_df['month'].astype(str) + '-' + temp_df['year'].astype(str)
 st.set_page_config(page_title='Startip Funding Analysis',layout='wide')
 
-
+ 
 
 def load_investor_detail(investor):
     st.title(investor)
@@ -116,7 +116,29 @@ def Overall_analysis():
     ax2.tick_params(axis='x', rotation=45)
     ax2.set_xticks(ax2.get_xticks()[::2])
     st.pyplot(fig2)
-
+    col3,col4=st.columns(2)
+    with col3:
+        df['vertical'] = df['vertical'].str.strip().str.lower()
+        total_startup_df=df.groupby('vertical')['startup'].count().sort_values(ascending=False).reset_index()
+        total_startup_df.set_index('vertical')
+        st.subheader(f'Top Five Scetors To Get Funded')
+        fig3, ax3 = plt.subplots(figsize=(10, 3))
+        filtered_df = total_startup_df[total_startup_df['startup'] > 50]
+        ax3.pie(
+        filtered_df['startup'],               # Numerical values
+        labels=filtered_df['vertical'],       # Labels for each slice
+        autopct="%0.1f%%")
+        st.pyplot(fig3)
+    with col4:
+        total_amount_startup_df=df.groupby('vertical')['amount'].sum().sort_values(ascending=False).head(10)
+        st.subheader('Top 10 Sectors Based on Amount Invested')
+        fig4, ax4 = plt.subplots(figsize=(10, 10))
+        ax4.pie(
+            total_amount_startup_df,
+            labels=total_amount_startup_df.index,
+            autopct="%0.1f%%")
+        st.pyplot(fig4)
+    
 
 
 
