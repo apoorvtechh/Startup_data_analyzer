@@ -121,7 +121,7 @@ def Overall_analysis():
         df['vertical'] = df['vertical'].str.strip().str.lower()
         total_startup_df=df.groupby('vertical')['startup'].count().sort_values(ascending=False).reset_index()
         total_startup_df.set_index('vertical')
-        st.subheader(f'Top Five Scetors To Get Funded')
+        st.subheader(f'Top Five Sectors To Get Funded')
         fig3, ax3 = plt.subplots(figsize=(10, 3))
         filtered_df = total_startup_df[total_startup_df['startup'] > 50]
         ax3.pie(
