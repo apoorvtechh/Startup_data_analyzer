@@ -24,7 +24,7 @@ temp_df=df.groupby(['year','month'])['amount'].sum().reset_index()
 temp_df['month']=temp_df['month'].astype('int')
 temp_df['year']=temp_df['year'].astype('int')
 temp_df['x_axis']=temp_df['month'].astype(str) + '-' + temp_df['year'].astype(str)
-st.set_page_config(page_title='Startip Funding Analysis',layout='wide')
+st.set_page_config(page_title='Startup Funding Analysis',layout='wide')
 
  
 
